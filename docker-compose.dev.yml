@@ -1,0 +1,27 @@
+# Development docker-compose override
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  postgres:
+    ports:
+      - "5432:5432" # Expose port for local development
+    environment:
+      POSTGRES_DB: demo_db_dev
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: dev,docker
+    volumes:
+      - ./src:/app/src # Mount source for hot reload (if using dev tools)
+    ports:
+      - "8080:8080"
+      - "5005:5005" # Debug port
+
+volumes:
+  postgres_dev_data:
+    driver: local
